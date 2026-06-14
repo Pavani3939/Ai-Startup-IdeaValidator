@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Startup Idea Validator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-rocket"></i> StartupValidator<span>.ai</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="active">Analyze</a>
+            <a href="history.html">History</a>
+            <button id="theme-toggle" class="theme-btn">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>Validate Your <span class="gradient-text">Startup Idea</span> with AI</h1>
+        <p>Get instant feedback, market potential analysis, and actionable insights powered by Google Gemini.</p>
+    </header>
+
+    <main class="container">
+        <!-- Input Form Section -->
+        <section id="input-section" class="card fade-in">
+            <h2>Pitch Your Idea</h2>
+            <form id="idea-form">
+                <div class="form-group">
+                    <label for="title">Startup Name / Title</label>
+                    <input type="text" id="title" required maxlength="100" placeholder="e.g. EcoRide">
+                    <span class="error" id="title-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="industry">Industry Category</label>
+                    <select id="industry" required>
+                        <option value="">Select Industry</option>
+                        <option value="SaaS">SaaS</option>
+                        <option value="E-commerce">E-commerce</option>
+                        <option value="FinTech">FinTech</option>
+                        <option value="HealthTech">HealthTech</option>
+                        <option value="EdTech">EdTech</option>
+                        <option value="AI/ML">AI / Machine Learning</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span class="error" id="industry-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Detailed Description</label>
+                    <textarea id="description" rows="5" required maxlength="1000" placeholder="Describe the problem, your solution, and target audience..."></textarea>
+                    <div class="char-count"><span id="char-current">0</span>/1000</div>
+                    <span class="error" id="description-error"></span>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="reset-btn">Reset Form</button>
+                    <button type="submit" class="btn btn-primary" id="analyze-btn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze Idea
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Loading Screen Section -->
+        <section id="loading-section" class="hidden">
+            <div class="loader-container">
+                <div class="ai-brain-pulse">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <h3>Gemini is analyzing your idea...</h3>
+                <p>Evaluating market potential, identifying pros & cons, and calculating success score.</p>
+            </div>
+        </section>
+
+        <!-- Results Dashboard Section -->
+        <section id="results-section" class="hidden fade-in">
+            <div class="results-header">
+                <h2>Analysis Results</h2>
+                <div class="results-actions">
+                    <button class="btn btn-secondary" id="new-analysis-btn">New Analysis</button>
+                    <button class="btn btn-primary" id="download-pdf-btn">
+                        <i class="fa-solid fa-file-pdf"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Score Card -->
+                <div class="result-card score-card span-2">
+                    <h3>Success Probability Score</h3>
+                    <div class="score-meter-container">
+                        <svg class="score-meter" viewBox="0 0 36 36">
+                            <path class="circle-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle-progress" id="score-path" stroke-dasharray="0, 100"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="score-value"><span id="score-text">0</span>/10</div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="result-card span-2">
+                    <h3><i class="fa-solid fa-align-left text-blue"></i> Executive Summary</h3>
+                    <p id="res-summary"></p>
+                </div>
+
+                <!-- Market Potential -->
+                <div class="result-card span-2">
+                    <h3><i class="fa-solid fa-chart-line text-purple"></i> Market Potential</h3>
+                    <p id="res-market"></p>
+                </div>
+
+                <!-- Advantages -->
+                <div class="result-card">
+                    <h3><i class="fa-solid fa-check-circle text-green"></i> Advantages</h3>
+                    <ul id="res-advantages" class="custom-list success"></ul>
+                </div>
+
+                <!-- Disadvantages -->
+                <div class="result-card">
+                    <h3><i class="fa-solid fa-exclamation-triangle text-red"></i> Potential Risks</h3>
+                    <ul id="res-disadvantages" class="custom-list danger"></ul>
+                </div>
+
+                <!-- Suggestions -->
+                <div class="result-card span-2">
+                    <h3><i class="fa-solid fa-lightbulb text-yellow"></i> Improvement Suggestions</h3>
+                    <ul id="res-suggestions" class="custom-list info"></ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

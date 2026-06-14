@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - AI Startup Idea Validator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-rocket"></i> StartupValidator<span>.ai</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Analyze</a>
+            <a href="history.html" class="active">History</a>
+            <button id="theme-toggle" class="theme-btn">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero-small">
+        <h1>Your <span class="gradient-text">Analyzed</span> Ideas</h1>
+    </header>
+
+    <main class="container">
+        <div class="controls-bar">
+            <div class="search-box">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search past ideas...">
+            </div>
+            <div class="sort-box">
+                <select id="sort-select">
+                    <option value="createdAt,desc">Newest First</option>
+                    <option value="createdAt,asc">Oldest First</option>
+                    <option value="successScore,desc">Highest Score</option>
+                    <option value="successScore,asc">Lowest Score</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="history-loading" class="text-center py-4">
+            <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
+            <p>Loading history...</p>
+        </div>
+
+        <div id="history-grid" class="history-grid hidden">
+            <!-- Dynamic Content -->
+        </div>
+
+        <div id="pagination" class="pagination hidden">
+            <button id="prev-btn" class="btn btn-secondary" disabled>Previous</button>
+            <span id="page-info">Page 1</span>
+            <button id="next-btn" class="btn btn-secondary">Next</button>
+        </div>
+        
+        <div id="empty-state" class="empty-state hidden">
+            <i class="fa-solid fa-folder-open"></i>
+            <h3>No past ideas found</h3>
+            <p>You haven't analyzed any startup ideas yet.</p>
+            <a href="index.html" class="btn btn-primary mt-2">Analyze Now</a>
+        </div>
+    </main>
+
+    <script src="js/history.js"></script>
+</body>
+</html>
