@@ -56,7 +56,38 @@ public class GeminiService {
                 else if (keywordMatches >= 2) score += 2;
                 else if (keywordMatches >= 1) score += 1;
                 
-                // 3. Unique words ratio / Repetition penalty (up to 3 points)
+                // 3. Context Matching (Title & Industry) (up to 3 points)
+                int contextPoints = 0;
+                boolean isIndustryMatched = industry != null && !industry.trim().isEmpty() && descLower.contains(industry.toLowerCase());
+                if (isIndustryMatched) {
+                    contextPoints += 2;
+                }
+                
+                boolean isTitleMatched = false;
+                if (title != null && !title.trim().isEmpty()) {
+                    String[] titleWords = title.toLowerCase().split("\\s+");
+                    for (String tw : titleWords) {
+                        if (tw.length() >= 3 && descLower.contains(tw)) {
+                            contextPoints += 1;
+                            isTitleMatched = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!isIndustryMatched && !isTitleMatched) {
+                    mockResponse.setSuccessScore(1);
+                    mockResponse.setSummary("Not matched. Your description does not appear to relate to your Idea Title or Technology/Industry.");
+                    mockResponse.setAdvantages(List.of("N/A"));
+                    mockResponse.setDisadvantages(List.of("N/A"));
+                    mockResponse.setMarketPotential("N/A");
+                    mockResponse.setSuggestions(List.of("Please ensure your description actually describes the Idea and Technology you entered."));
+                    return mockResponse;
+                }
+                
+                score += Math.min(3, contextPoints);
+
+                // 4. Unique words ratio / Repetition penalty (up to 3 points)
                 long uniqueWords = java.util.Arrays.stream(words).map(String::toLowerCase).distinct().count();
                 double richness = wordCount > 0 ? (double) uniqueWords / wordCount : 0;
                 
