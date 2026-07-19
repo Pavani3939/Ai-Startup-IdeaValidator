@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://ai-startup-ideavalidator.onrender.com/api';
+const API_BASE_URL = 'https://ai-startup-ideavalidator-1.onrender.com/api';
 
 // DOM Elements
 const themeToggle = document.getElementById('theme-toggle');
