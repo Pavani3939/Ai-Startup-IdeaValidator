@@ -1,7 +1,0 @@
-{
-  "name": "ai-startup-validator-deploy",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "rm -rf public && mkdir -p public && cp -r frontend/* public/"
-  }
-}
