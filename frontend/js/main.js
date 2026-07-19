@@ -78,8 +78,8 @@ function validateForm() {
     }
 
     // Description
-    if (!descriptionInput.value.trim() || descriptionInput.value.length < 20) {
-        document.getElementById('description-error').textContent = 'Description is required and should be at least 20 characters';
+    if (!descriptionInput.value.trim() || descriptionInput.value.length < 30) {
+        document.getElementById('description-error').textContent = 'Description is required and should be at least 30 characters';
         isValid = false;
     } else {
         document.getElementById('description-error').textContent = '';
