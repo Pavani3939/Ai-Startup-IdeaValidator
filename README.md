@@ -2,7 +2,7 @@
 
 The AI Startup Idea Validator is an intelligent, full-stack web application engineered to evaluate and refine entrepreneurial concepts. By leveraging Google's Gemini AI, the system analyzes user-submitted business ideas to provide actionable feedback, market potential analysis, and objective success scoring, helping founders validate their vision before investing capital.
 
-🚀 **[Live Demo](https://ai-startup-idea-validator-three.vercel.app/)**
+🚀 **[Live Demo](https://ai-startup-idea-validator-5e5d.vercel.app/)**
 
 *(Note: The live demo runs a highly optimized browser simulation of the AI logic for instant access. To utilize the full Java backend and real Gemini API integration, please refer to the local setup instructions below.)*
 
