@@ -48,19 +48,14 @@ async function fetchHistory() {
 
     try {
         const sortValue = sortSelect.value;
+        const response = await fetch(`${API_BASE_URL}/ideas/history?page=${currentPage}&size=${pageSize}&sortBy=${sortValue}`);
         
-        // FAKE HISTORY DATA
-        const fakeData = {
-            content: [
-                { id: "1", title: "Eco Deliveries", industry: "Logistics", summary: "This is an excellent startup idea! Eco Deliveries addresses a clear pain point...", successScore: 8, createdAt: new Date().toISOString() },
-                { id: "2", title: "AI Legal Assistant", industry: "LegalTech", summary: "Strong potential. However, regulatory hurdles in the LegalTech industry...", successScore: 6, createdAt: new Date(Date.now() - 86400000).toISOString() },
-                { id: "3", title: "VR Fitness Studio", industry: "Health & Wellness", summary: "A very trendy idea with high customer acquisition cost but strong retention...", successScore: 7, createdAt: new Date(Date.now() - 172800000).toISOString() }
-            ],
-            totalPages: 1,
-            totalElements: 3
-        };
-        
-        let items = fakeData.content;
+        if (!response.ok) {
+            throw new Error('Failed to fetch history');
+        }
+
+        const data = await response.json();
+        let items = data.content || [];
         const searchTerm = searchInput.value.trim().toLowerCase();
         
         if (searchTerm) {
@@ -70,11 +65,9 @@ async function fetchHistory() {
             );
         }
 
-        setTimeout(() => {
-            renderHistory(items);
-            totalPages = fakeData.totalPages;
-            updatePagination(fakeData.totalElements);
-        }, 500);
+        renderHistory(items);
+        totalPages = data.totalPages || 1;
+        updatePagination(data.totalElements || 0);
         
     } catch (error) {
         console.error(error);
@@ -110,16 +103,20 @@ function renderHistory(items) {
             <div class="history-card-desc">${item.summary}</div>
             <div class="history-card-footer">
                 <button class="btn btn-secondary view-btn" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;" data-id="${item.id}">
-                    <i class="fa-solid fa-eye"></i> View PDF
+                    <i class="fa-solid fa-file-pdf"></i> Download PDF
                 </button>
             </div>
         `;
-        historyGrid.appendChild(card);
-    });
+        
+        // Add click event listener to Download PDF button
+        const viewBtn = card.querySelector('.view-btn');
+        if (viewBtn) {
+            viewBtn.addEventListener('click', () => {
+                window.location.href = `${API_BASE_URL}/reports/${item.id}/pdf`;
+            });
+        }
 
-    // Removed View PDF buttons since backend is mocked
-    document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.style.display = 'none';
+        historyGrid.appendChild(card);
     });
 }
 

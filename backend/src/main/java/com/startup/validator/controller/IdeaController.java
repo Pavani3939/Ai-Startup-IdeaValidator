@@ -26,7 +26,12 @@ public class IdeaController {
     }
 
     @PostMapping("/analyze")
-    public ResponseEntity<AnalysisResponseDTO> analyzeIdea(@Valid @RequestBody IdeaRequestDTO request) {
+    public ResponseEntity<?> analyzeIdea(@Valid @RequestBody IdeaRequestDTO request) {
+        String description = request.getDescription();
+        if (description == null || description.length() < 30 || description.chars().distinct().count() < 10 || !description.contains(" ")) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Invalid input: Please provide a meaningful and detailed business description instead of placeholder text."));
+        }
+        
         AnalysisResponseDTO response = ideaService.processIdea(request);
         return ResponseEntity.ok(response);
     }

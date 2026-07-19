@@ -105,33 +105,29 @@ if (ideaForm) {
         inputSection.classList.add('hidden');
         loadingSection.classList.remove('hidden');
 
-        // Simulate Network Delay and AI Processing (2.5 seconds)
-        setTimeout(() => {
-            const data = {
-                id: Date.now().toString(),
-                summary: "This is an excellent startup idea! " + payload.title + " addresses a clear pain point in the " + payload.industry + " industry. The approach described (" + payload.description.substring(0, 50) + "...) shows strong potential for disruption by utilizing modern technology to solve traditional problems.",
-                advantages: [
-                    "High demand in the current market for " + payload.industry + " solutions.",
-                    "Scalable business model.",
-                    "Clear target audience and value proposition."
-                ],
-                disadvantages: [
-                    "Potential high initial customer acquisition cost.",
-                    "Possible regulatory hurdles depending on the region.",
-                    "Strong competition from established players."
-                ],
-                marketPotential: "The " + payload.industry + " market is growing at a rapid pace. If " + payload.title + " can capture even a 1% market share in the first two years, it could lead to multi-million dollar recurring revenue.",
-                suggestions: [
-                    "Focus heavily on building a strong MVP before seeking large funding.",
-                    "Partner with existing local businesses to reduce customer acquisition costs.",
-                    "Implement a freemium model to drive early user adoption."
-                ],
-                successScore: 8
-            };
-            
+        try {
+            const response = await fetch(`${API_BASE_URL}/ideas/analyze`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to analyze the startup idea. Please try again.');
+            }
+
+            const data = await response.json();
             currentReportId = data.id;
             displayResults(data);
-        }, 2500);
+        } catch (error) {
+            console.error('Error analyzing idea:', error);
+            alert(error.message || 'An error occurred while analyzing the idea.');
+            // Go back to input section
+            loadingSection.classList.add('hidden');
+            inputSection.classList.remove('hidden');
+        }
     });
 }
 
@@ -202,9 +198,13 @@ if (newAnalysisBtn) {
     });
 }
 
-// Download PDF (Removed as it requires backend)
+// Download PDF
 if (downloadPdfBtn) {
-    downloadPdfBtn.style.display = 'none';
+    downloadPdfBtn.addEventListener('click', () => {
+        if (currentReportId) {
+            window.location.href = `${API_BASE_URL}/reports/${currentReportId}/pdf`;
+        }
+    });
 }
 
 // Initialization
