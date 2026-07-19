@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'https://ai-startup-ideavalidator.onrender.com/api';
 
 const themeToggle = document.getElementById('theme-toggle');
 const historyGrid = document.getElementById('history-grid');
