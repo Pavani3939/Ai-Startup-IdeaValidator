@@ -105,6 +105,26 @@ if (ideaForm) {
         inputSection.classList.add('hidden');
         loadingSection.classList.remove('hidden');
 
+        const quotes = [
+            '"The best way to predict the future is to create it." - Peter Drucker',
+            '"Ideas are easy. Implementation is hard." - Guy Kawasaki',
+            '"Move fast and break things." - Mark Zuckerberg',
+            '"If you are not embarrassed by the first version of your product, you’ve launched too late." - Reid Hoffman',
+            '"Chase the vision, not the money, the money will end up following you." - Tony Hsieh'
+        ];
+        let quoteIndex = 0;
+        const quoteEl = document.getElementById('loading-quote');
+        quoteEl.textContent = quotes[0];
+        
+        const quoteInterval = setInterval(() => {
+            quoteIndex = (quoteIndex + 1) % quotes.length;
+            quoteEl.style.opacity = 0;
+            setTimeout(() => {
+                quoteEl.textContent = quotes[quoteIndex];
+                quoteEl.style.opacity = 1;
+            }, 300);
+        }, 3000);
+
         try {
             const response = await fetch(`${API_BASE_URL}/ideas/analyze`, {
                 method: 'POST',
@@ -120,10 +140,12 @@ if (ideaForm) {
 
             const data = await response.json();
             currentReportId = data.id;
+            clearInterval(quoteInterval);
             displayResults(data);
         } catch (error) {
             console.error('Error analyzing idea:', error);
             alert(error.message || 'An error occurred while analyzing the idea.');
+            clearInterval(quoteInterval);
             // Go back to input section
             loadingSection.classList.add('hidden');
             inputSection.classList.remove('hidden');

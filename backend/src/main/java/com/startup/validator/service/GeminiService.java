@@ -145,7 +145,18 @@ public class GeminiService {
                     .get(0)
                     .getText();
 
-            return objectMapper.readValue(json, AnalysisResponseDTO.class);
+            // Strip potential markdown formatting that Gemini sometimes includes
+            if (json.startsWith("```json")) {
+                json = json.substring(7);
+            }
+            if (json.startsWith("```")) {
+                json = json.substring(3);
+            }
+            if (json.endsWith("```")) {
+                json = json.substring(0, json.length() - 3);
+            }
+
+            return objectMapper.readValue(json.trim(), AnalysisResponseDTO.class);
 
         } catch (Exception e) {
             throw new GeminiApiException("Failed to call or parse Gemini response", e);

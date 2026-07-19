@@ -20,9 +20,12 @@ public class PdfService {
             document.open();
 
             // Fonts
-            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 22, Font.BOLD);
-            Font headingFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, Font.BOLD);
-            Font textFont = FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL);
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, new java.awt.Color(79, 70, 229));
+            Font headingFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, new java.awt.Color(30, 41, 59));
+            Font textFont = FontFactory.getFont(FontFactory.HELVETICA, 12, new java.awt.Color(100, 116, 139));
+            Font greenFont = FontFactory.getFont(FontFactory.HELVETICA, 12, new java.awt.Color(34, 197, 94));
+            Font redFont = FontFactory.getFont(FontFactory.HELVETICA, 12, new java.awt.Color(239, 68, 68));
+            Font orangeFont = FontFactory.getFont(FontFactory.HELVETICA, 12, new java.awt.Color(245, 158, 11));
 
             // Title
             Paragraph title = new Paragraph("Startup Idea Analysis Report", titleFont);
@@ -54,7 +57,7 @@ public class PdfService {
             document.add(new Paragraph("Advantages", headingFont));
             com.lowagie.text.List advantagesList = new com.lowagie.text.List(com.lowagie.text.List.UNORDERED);
             for (String adv : report.getAdvantages()) {
-                advantagesList.add(new ListItem(adv, textFont));
+                advantagesList.add(new ListItem(adv, greenFont));
             }
             document.add(advantagesList);
             document.add(new Paragraph(" "));
@@ -63,7 +66,7 @@ public class PdfService {
             document.add(new Paragraph("Disadvantages", headingFont));
             com.lowagie.text.List disadvantagesList = new com.lowagie.text.List(com.lowagie.text.List.UNORDERED);
             for (String dis : report.getDisadvantages()) {
-                disadvantagesList.add(new ListItem(dis, textFont));
+                disadvantagesList.add(new ListItem(dis, redFont));
             }
             document.add(disadvantagesList);
             document.add(new Paragraph(" "));
@@ -72,7 +75,7 @@ public class PdfService {
             document.add(new Paragraph("Improvement Suggestions", headingFont));
             com.lowagie.text.List suggestionsList = new com.lowagie.text.List(com.lowagie.text.List.UNORDERED);
             for (String sug : report.getImprovementSuggestions()) {
-                suggestionsList.add(new ListItem(sug, textFont));
+                suggestionsList.add(new ListItem(sug, orangeFont));
             }
             document.add(suggestionsList);
 

@@ -42,10 +42,19 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background-color: var(--bg-color);
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
     color: var(--text-color);
     line-height: 1.6;
     transition: var(--transition);
+    min-height: 100vh;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* Utilities */
@@ -145,11 +154,13 @@ body {
 
 /* Cards */
 .card {
-    background-color: var(--card-bg);
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius);
     padding: 2rem;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .card h2 {
@@ -230,7 +241,7 @@ input:focus, select:focus, textarea:focus {
 .btn-primary:hover {
     background-color: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 0 15px var(--primary-color);
 }
 
 .btn-secondary {
@@ -261,6 +272,12 @@ input:focus, select:focus, textarea:focus {
     animation: pulse 1.5s infinite alternate;
 }
 
+#loading-quote {
+    font-style: italic;
+    color: var(--text-muted);
+    transition: opacity 0.3s ease;
+}
+
 @keyframes pulse {
     0% { transform: scale(0.9); opacity: 0.7; filter: drop-shadow(0 0 10px var(--primary-color)); }
     100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 30px var(--primary-color)); }
@@ -281,11 +298,13 @@ input:focus, select:focus, textarea:focus {
 }
 
 .result-card {
-    background-color: var(--card-bg);
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius);
     padding: 1.5rem;
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .span-2 { grid-column: span 2; }
@@ -400,11 +419,13 @@ input:focus, select:focus, textarea:focus {
 }
 
 .history-card {
-    background-color: var(--card-bg);
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius);
     padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     display: flex;
     flex-direction: column;
     transition: var(--transition);
