@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:startup_validator;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.H2Dialect
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:your-default-api-key-if-not-set-in-env}
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent
