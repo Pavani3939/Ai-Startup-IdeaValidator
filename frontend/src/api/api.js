@@ -174,12 +174,70 @@ function handleClientSideFallback(path, method, body) {
     return newReport;
   }
 
-  // Get Ideas / History (Paginated)
-  if (path.startsWith('/ideas') && method === 'GET') {
+  // ── Sub-resource routes MUST come before the generic /ideas GET handler ──
+
+  // Competitor Analysis  (GET /ideas/:id/competitors  OR  POST /ideas/:id/competitors/analyze)
+  if (path.includes('/competitors')) {
+    if (method === 'POST') {
+      // POST analyze — return fresh demo competitors (same data, would be AI in backend)
+    }
+    const ideaId = path.split('/')[2];
+    const key = `demo_competitors_${ideaId}`;
+    const saved = localStorage.getItem(key);
+    if (saved && method === 'GET') {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
     const ideas = getLocalIdeas();
-    const parts = path.split('/');
-    if (parts.length === 3 && !path.includes('?')) {
-      const id = parts[2];
+    const idea = ideas.find(i => String(i.id) === String(ideaId) || String(i.ideaId) === String(ideaId));
+    const industry = idea ? idea.industry : 'Technology';
+    const title = idea ? (idea.title || idea.startupName) : 'Your Startup';
+
+    const competitors = [
+      {
+        id: 1,
+        name: `Established ${industry} Incumbent`,
+        website: 'incumbent-example.com',
+        summary: `Large market player offering enterprise-focused solutions in the ${industry} domain with comprehensive feature suites.`,
+        targetSegment: 'Enterprise organizations and mid-market companies',
+        strengths: 'Brand awareness, deep financial reserves, established channel partnerships.',
+        weaknesses: 'Legacy user interface, high pricing tiers, slow feature release cycles.',
+        differentiation: `${title} can win by providing faster onboarding, a streamlined modern UX, and accessible self-serve pricing.`,
+        sourceUrl: 'Preliminary AI assessment - independent verification recommended'
+      },
+      {
+        id: 2,
+        name: `Agile ${industry} Challenger`,
+        website: 'challenger-example.io',
+        summary: `Venture-backed recent entrant targeting modern digital-first teams with point solutions in ${industry}.`,
+        targetSegment: 'Startups, SMBs, and tech-forward practitioners',
+        strengths: 'Modern interface, developer APIs, responsive customer service.',
+        weaknesses: 'Narrow focus, limited international localization, shallow enterprise compliance.',
+        differentiation: `${title} can stand out through specialized vertical customization and superior community-driven workflows.`,
+        sourceUrl: 'Preliminary AI assessment - independent verification recommended'
+      },
+      {
+        id: 3,
+        name: 'Internal Manual Workarounds / Spreadsheets',
+        website: 'N/A (Status Quo)',
+        summary: 'Prospective customers relying on legacy spreadsheets, emails, and manual fragmented processes.',
+        targetSegment: 'Teams accustomed to zero incremental software spend',
+        strengths: 'Zero upfront budget required, maximum customizability.',
+        weaknesses: 'High human error rates, zero automation, massive time inefficiencies.',
+        differentiation: `${title} provides automated validation, real-time collaboration, and actionable structured workflows.`,
+        sourceUrl: 'Market observation - independent verification recommended'
+      }
+    ];
+    localStorage.setItem(key, JSON.stringify(competitors));
+    return competitors;
+  }
+
+  // Get Ideas / History (Paginated) — only matches /ideas list or /ideas/:id (NOT sub-paths)
+  if (path.startsWith('/ideas') && method === 'GET' && !path.match(/\/ideas\/\d+\/.+/)) {
+    const ideas = getLocalIdeas();
+    const parts = path.split('/').filter(Boolean);
+    // /ideas/:id — single idea detail
+    if (parts.length === 2 && !path.includes('?')) {
+      const id = parts[1];
       const found = ideas.find(i => String(i.id) === String(id) || String(i.ideaId) === String(id));
       if (found) {
         return {
@@ -188,6 +246,7 @@ function handleClientSideFallback(path, method, body) {
         };
       }
     }
+    // /ideas?page=0&size=20 — paginated list
     return {
       content: ideas,
       totalElements: ideas.length,
@@ -196,51 +255,12 @@ function handleClientSideFallback(path, method, body) {
   }
 
   // Delete Idea
-  if (path.startsWith('/ideas/') && method === 'DELETE') {
+  if (path.startsWith('/ideas/') && method === 'DELETE' && !path.match(/\/ideas\/\d+\/.+/)) {
     const id = path.split('/')[2];
     let ideas = getLocalIdeas();
     ideas = ideas.filter(i => String(i.id) !== String(id) && String(i.ideaId) !== String(id));
     saveLocalIdeas(ideas);
     return { message: 'Idea deleted successfully' };
-  }
-
-  // Competitor Analysis
-  if (path.includes('/competitors')) {
-    return [
-      {
-        id: 1,
-        name: 'Established Enterprise Incumbent',
-        website: 'incumbent-example.com',
-        summary: 'Market incumbent providing legacy solutions with extensive feature lists and high custom contracts.',
-        targetSegment: 'Large Enterprise',
-        strengths: 'Deep cash reserves, enterprise compliance, widespread brand recognition.',
-        weaknesses: 'Slow support cycles, high pricing, clunky user experience.',
-        differentiation: 'Win by offering rapid 5-minute self-serve onboarding, transparent pricing, and modern UI.',
-        sourceUrl: 'Preliminary AI assessment'
-      },
-      {
-        id: 2,
-        name: 'Agile Point Solution Challenger',
-        website: 'challenger-example.io',
-        summary: 'Recently funded point-solution provider targeting tech-forward SMBs.',
-        targetSegment: 'Startups & SMBs',
-        strengths: 'Modern clean UI, active developer community.',
-        weaknesses: 'Narrow feature breadth, lack of enterprise integrations.',
-        differentiation: 'Provide deep workflow automation and end-to-end multi-tier analytics.',
-        sourceUrl: 'Preliminary AI assessment'
-      },
-      {
-        id: 3,
-        name: 'Manual Spreadsheets & Email Workarounds',
-        website: 'N/A (Status Quo)',
-        summary: 'Target customers handling the problem using spreadsheets, emails, and fragmented manual checks.',
-        targetSegment: 'All segments prior to software adoption',
-        strengths: 'Zero software license cost, infinite customization.',
-        weaknesses: 'Massive human error, no real-time audit trail, high operational waste.',
-        differentiation: 'Automate repetitive tasks and deliver instant reporting dashboards.',
-        sourceUrl: 'Market observation'
-      }
-    ];
   }
 
   // Financial Feasibility
@@ -302,50 +322,66 @@ function handleClientSideFallback(path, method, body) {
     }
   }
 
-  // Roadmap Tasks
+  // Roadmap Tasks — per-idea persistence
   if (path.includes('/roadmap')) {
-    const key = 'demo_roadmap_tasks';
-    let savedTasks = localStorage.getItem(key);
-    let tasks = savedTasks ? JSON.parse(savedTasks) : [
-      { id: 1, title: 'Conduct 15 customer discovery interviews', description: 'Validate problem severity with prospective users.', priority: 'HIGH', status: 'COMPLETED', phase: 'Phase 1: Validate Problem', estimatedTimeframe: 'Weeks 1-2' },
-      { id: 2, title: 'Map competitor pricing & feature gaps', description: 'Identify where incumbents fall short.', priority: 'MEDIUM', status: 'IN_PROGRESS', phase: 'Phase 1: Validate Problem', estimatedTimeframe: 'Weeks 2-3' },
-      { id: 3, title: 'Create interactive clickable wireframe', description: 'Design workflow in prototype tool and test with 5 users.', priority: 'HIGH', status: 'PENDING', phase: 'Phase 2: Validate Solution', estimatedTimeframe: 'Weeks 3-4' },
-      { id: 4, title: 'Launch teaser landing page with waitlist', description: 'Measure conversion intent from target traffic.', priority: 'MEDIUM', status: 'PENDING', phase: 'Phase 2: Validate Solution', estimatedTimeframe: 'Weeks 4-5' },
-      { id: 5, title: 'Establish unit economics & pricing tiers', description: 'Determine break-even volume and margin.', priority: 'HIGH', status: 'PENDING', phase: 'Phase 3: Validate Business Model', estimatedTimeframe: 'Weeks 5-6' },
-      { id: 6, title: 'Build tightly scoped MVP', description: 'Develop core problem-solving feature set.', priority: 'HIGH', status: 'PENDING', phase: 'Phase 4: Build and Launch', estimatedTimeframe: 'Weeks 7-10' },
-      { id: 7, title: 'Onboard first 10 closed-beta users', description: 'Provide white-glove onboarding and iterate rapidly.', priority: 'HIGH', status: 'PENDING', phase: 'Phase 4: Build and Launch', estimatedTimeframe: 'Weeks 10-12' },
-      { id: 8, title: 'Measure user retention and NPS', description: 'Track active product usage and gather feedback.', priority: 'MEDIUM', status: 'PENDING', phase: 'Phase 5: Measure and Improve', estimatedTimeframe: 'Month 3+' }
+    // Determine ideaId from path: /ideas/:id/roadmap or /ideas/:id/roadmap/tasks
+    // Also handles /roadmap/tasks/:taskId for PUT/DELETE (no ideaId in path)
+    const pathParts = path.split('/').filter(Boolean);
+    const ideasIndex = pathParts.indexOf('ideas');
+    const ideaId = ideasIndex !== -1 ? pathParts[ideasIndex + 1] : null;
+    const key = ideaId ? `demo_roadmap_${ideaId}` : 'demo_roadmap_tasks';
+
+    const defaultTasks = [
+      { id: 1, title: 'Conduct 15 target customer discovery interviews', description: 'Interview prospective users to validate that the identified problem causes recurring pain and willingness to pay.', priority: 'HIGH', status: 'PENDING', phase: 'Phase 1: Validate Problem', estimatedTimeframe: 'Weeks 1-2' },
+      { id: 2, title: 'Map competitive alternatives and current workarounds', description: 'Document existing solutions, their pricing, and identify primary gaps your product will exploit.', priority: 'MEDIUM', status: 'PENDING', phase: 'Phase 1: Validate Problem', estimatedTimeframe: 'Weeks 2-3' },
+      { id: 3, title: 'Create interactive wireframe or clickable prototype', description: 'Design key workflows and present to early interviewees to confirm user experience and solution fit.', priority: 'HIGH', status: 'PENDING', phase: 'Phase 2: Validate Solution', estimatedTimeframe: 'Weeks 3-4' },
+      { id: 4, title: 'Launch teaser landing page with email waitlist', description: 'Measure market interest through landing page conversion rates and collect early adopter feedback.', priority: 'MEDIUM', status: 'PENDING', phase: 'Phase 2: Validate Solution', estimatedTimeframe: 'Weeks 4-5' },
+      { id: 5, title: 'Establish initial pricing and unit economics model', description: 'Model cost of acquisition (CAC) and customer lifetime value (LTV) using the Financial Feasibility calculator.', priority: 'HIGH', status: 'PENDING', phase: 'Phase 3: Validate Business Model', estimatedTimeframe: 'Weeks 5-6' },
+      { id: 6, title: 'Identify primary acquisition channel', description: 'Test organic outreach, cold emails, content, or targeted test ads to find the most cost-effective channel.', priority: 'MEDIUM', status: 'PENDING', phase: 'Phase 3: Validate Business Model', estimatedTimeframe: 'Weeks 6-7' },
+      { id: 7, title: 'Develop tightly scoped Minimum Viable Product (MVP)', description: 'Build only essential features required to solve the core customer problem without extra bloat.', priority: 'HIGH', status: 'PENDING', phase: 'Phase 4: Build and Launch', estimatedTimeframe: 'Weeks 7-10' },
+      { id: 8, title: 'Onboard first 10 closed-beta users', description: 'Provide white-glove onboarding for early users, gather bug reports, and iterate rapidly.', priority: 'HIGH', status: 'PENDING', phase: 'Phase 4: Build and Launch', estimatedTimeframe: 'Weeks 10-12' },
+      { id: 9, title: 'Measure retention, usage frequency, and NPS', description: 'Establish core analytics tracking active engagement and customer satisfaction.', priority: 'MEDIUM', status: 'PENDING', phase: 'Phase 5: Measure and Improve', estimatedTimeframe: 'Month 3+' }
     ];
 
+    let savedTasks = localStorage.getItem(key);
+    let tasks = savedTasks ? JSON.parse(savedTasks) : defaultTasks;
+
+    // POST /ideas/:id/roadmap/tasks — add new task
     if (method === 'POST') {
       const newTask = {
         id: Date.now(),
-        title: body.title || 'New Task',
-        description: body.description || '',
-        priority: body.priority || 'MEDIUM',
-        status: body.status || 'PENDING',
-        phase: body.phase || 'Phase 1: Validate Problem',
-        estimatedTimeframe: body.estimatedTimeframe || 'Weeks 1-2'
+        title: (body && body.title) || 'New Task',
+        description: (body && body.description) || '',
+        priority: (body && body.priority) || 'MEDIUM',
+        status: (body && body.status) || 'PENDING',
+        phase: (body && body.phase) || 'Phase 1: Validate Problem',
+        estimatedTimeframe: (body && body.estimatedTimeframe) || 'Weeks 1-2'
       };
       tasks.push(newTask);
       localStorage.setItem(key, JSON.stringify(tasks));
       return newTask;
     }
 
+    // PUT /roadmap/tasks/:taskId — update task status/fields
     if (method === 'PUT') {
-      const taskId = parseInt(path.split('/').pop());
+      const taskId = parseInt(pathParts[pathParts.length - 1]);
       tasks = tasks.map(t => t.id === taskId ? { ...t, ...body } : t);
       localStorage.setItem(key, JSON.stringify(tasks));
       return tasks.find(t => t.id === taskId) || body;
     }
 
+    // DELETE /roadmap/tasks/:taskId
     if (method === 'DELETE') {
-      const taskId = parseInt(path.split('/').pop());
+      const taskId = parseInt(pathParts[pathParts.length - 1]);
       tasks = tasks.filter(t => t.id !== taskId);
       localStorage.setItem(key, JSON.stringify(tasks));
       return { message: 'Task deleted' };
     }
 
+    // GET /ideas/:id/roadmap — return tasks for this idea (initialize if empty)
+    if (!savedTasks) {
+      localStorage.setItem(key, JSON.stringify(defaultTasks));
+    }
     return tasks;
   }
 

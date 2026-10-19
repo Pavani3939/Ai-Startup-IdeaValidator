@@ -59,8 +59,10 @@ export default function StartupRoadmap() {
   const loadRoadmap = async (ideaId) => {
     setLoading(true);
     try {
-      const list = await api.get(`/ideas/${ideaId}/roadmap`);
-      setTasks(list || []);
+      const res = await api.get(`/ideas/${ideaId}/roadmap`);
+      // Defensively handle both plain arrays and Spring Page<> wrappers
+      const list = Array.isArray(res) ? res : (res && Array.isArray(res.content) ? res.content : []);
+      setTasks(list);
     } catch (err) {
       setToast({ type: 'error', message: 'Failed to load roadmap tasks.' });
     } finally {
@@ -74,7 +76,8 @@ export default function StartupRoadmap() {
         ...task,
         status: newStatus
       });
-      setTasks(prev => prev.map(t => t.id === task.id ? updated : t));
+      const updatedTask = updated && updated.id ? updated : { ...task, status: newStatus };
+      setTasks(prev => prev.map(t => t.id === task.id ? updatedTask : t));
       setToast({ type: 'success', message: 'Task status updated.' });
     } catch (err) {
       setToast({ type: 'error', message: 'Failed to update task status.' });

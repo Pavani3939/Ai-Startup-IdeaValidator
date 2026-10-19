@@ -51,8 +51,10 @@ export default function CompetitorAnalysis() {
   const loadCompetitors = async (ideaId) => {
     setLoading(true);
     try {
-      const list = await api.get(`/ideas/${ideaId}/competitors`);
-      setCompetitors(list || []);
+      const res = await api.get(`/ideas/${ideaId}/competitors`);
+      // Defensively handle both plain arrays and Spring Page<> wrappers
+      const list = Array.isArray(res) ? res : (res && Array.isArray(res.content) ? res.content : []);
+      setCompetitors(list);
 
       // Resolve idea title
       const found = ideas.find(i => String(i.id) === String(ideaId));
@@ -72,7 +74,8 @@ export default function CompetitorAnalysis() {
     setAnalyzing(true);
     try {
       setToast({ type: 'info', message: 'Analyzing competitive landscape...' });
-      const results = await api.post(`/ideas/${selectedIdeaId}/competitors/analyze`, {});
+      const res = await api.post(`/ideas/${selectedIdeaId}/competitors/analyze`, {});
+      const results = Array.isArray(res) ? res : (res && Array.isArray(res.content) ? res.content : []);
       setCompetitors(results);
       setToast({ type: 'success', message: 'Competitive intelligence updated!' });
     } catch (err) {
