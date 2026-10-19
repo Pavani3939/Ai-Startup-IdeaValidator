@@ -436,7 +436,7 @@ async function request(path, options = {}) {
     // If backend is unreachable or fails to fetch (e.g. cloud deployment without backend host),
     // gracefully switch to intelligent client-side fallback engine so live demo works 100%!
     if (err.name === 'TypeError' || err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('Load failed')) {
-      return handleClientSideFallback(path, method, body);
+      throw new Error('Backend unavailable – demo fallback removed');
     }
     throw err;
   }
