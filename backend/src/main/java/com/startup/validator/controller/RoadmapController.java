@@ -2,7 +2,7 @@ package com.startup.validator.controller;
 
 import com.startup.validator.dto.RoadmapTaskDTO;
 import com.startup.validator.entity.StartupIdea;
-import com.startup.validator.repository.IdeaRepository;
+import com.startup.validator.repository.StartupIdeaRepository;
 import com.startup.validator.repository.UserRepository;
 import com.startup.validator.service.RoadmapService;
 import org.springframework.http.ResponseEntity;
@@ -12,15 +12,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import jakarta.validation.Valid;
 
 @RestController
 public class RoadmapController {
 
     private final RoadmapService roadmapService;
-    private final IdeaRepository ideaRepository;
+    private final StartupIdeaRepository ideaRepository;
     private final UserRepository userRepository;
 
-    public RoadmapController(RoadmapService roadmapService, IdeaRepository ideaRepository, UserRepository userRepository) {
+    public RoadmapController(RoadmapService roadmapService, StartupIdeaRepository ideaRepository, UserRepository userRepository) {
         this.roadmapService = roadmapService;
         this.ideaRepository = ideaRepository;
         this.userRepository = userRepository;

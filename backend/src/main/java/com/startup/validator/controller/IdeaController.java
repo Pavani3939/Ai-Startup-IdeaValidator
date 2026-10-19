@@ -8,7 +8,7 @@ import com.startup.validator.entity.AnalysisReport;
 import com.startup.validator.entity.StartupIdea;
 import com.startup.validator.entity.User;
 import com.startup.validator.repository.AnalysisReportRepository;
-import com.startup.validator.repository.IdeaRepository;
+import com.startup.validator.repository.StartupIdeaRepository;
 import com.startup.validator.repository.UserRepository;
 import com.startup.validator.service.IdeaService;
 import jakarta.validation.Valid;
@@ -29,12 +29,12 @@ public class IdeaController {
     private final IdeaService ideaService;
     private final AnalysisReportRepository reportRepository;
     private final UserRepository userRepository;
-    private final IdeaRepository ideaRepository;
+    private final StartupIdeaRepository ideaRepository;
 
     public IdeaController(IdeaService ideaService,
                           AnalysisReportRepository reportRepository,
                           UserRepository userRepository,
-                          IdeaRepository ideaRepository) {
+                          StartupIdeaRepository ideaRepository) {
         this.ideaService = ideaService;
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;

@@ -2,7 +2,7 @@ package com.startup.validator.controller;
 
 import com.startup.validator.dto.CompetitorDTO;
 import com.startup.validator.entity.StartupIdea;
-import com.startup.validator.repository.IdeaRepository;
+import com.startup.validator.repository.StartupIdeaRepository;
 import com.startup.validator.repository.UserRepository;
 import com.startup.validator.service.CompetitorService;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +17,10 @@ import java.util.List;
 public class CompetitorController {
 
     private final CompetitorService competitorService;
-    private final IdeaRepository ideaRepository;
+    private final StartupIdeaRepository ideaRepository;
     private final UserRepository userRepository;
 
-    public CompetitorController(CompetitorService competitorService, IdeaRepository ideaRepository, UserRepository userRepository) {
+    public CompetitorController(CompetitorService competitorService, StartupIdeaRepository ideaRepository, UserRepository userRepository) {
         this.competitorService = competitorService;
         this.ideaRepository = ideaRepository;
         this.userRepository = userRepository;
