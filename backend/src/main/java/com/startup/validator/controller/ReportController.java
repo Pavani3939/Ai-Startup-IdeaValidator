@@ -4,6 +4,7 @@ import com.startup.validator.dto.AnalysisResponseDTO;
 import com.startup.validator.entity.AnalysisReport;
 import com.startup.validator.exception.ResourceNotFoundException;
 import com.startup.validator.repository.AnalysisReportRepository;
+import com.startup.validator.service.IdeaService;
 import com.startup.validator.service.PdfService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,10 +20,14 @@ public class ReportController {
 
     private final AnalysisReportRepository reportRepository;
     private final PdfService pdfService;
+    private final IdeaService ideaService;
 
-    public ReportController(AnalysisReportRepository reportRepository, PdfService pdfService) {
+    public ReportController(AnalysisReportRepository reportRepository,
+                            PdfService pdfService,
+                            IdeaService ideaService) {
         this.reportRepository = reportRepository;
         this.pdfService = pdfService;
+        this.ideaService = ideaService;
     }
 
     @GetMapping("/{id}")
@@ -30,16 +35,7 @@ public class ReportController {
         AnalysisReport report = reportRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id: " + id));
 
-        AnalysisResponseDTO response = new AnalysisResponseDTO(
-                report.getId(),
-                report.getStartupIdea().getId(),
-                report.getSummary(),
-                report.getAdvantages(),
-                report.getDisadvantages(),
-                report.getMarketPotential(),
-                report.getImprovementSuggestions(),
-                report.getSuccessScore()
-        );
+        AnalysisResponseDTO response = ideaService.mapReportToDTO(report);
         return ResponseEntity.ok(response);
     }
 

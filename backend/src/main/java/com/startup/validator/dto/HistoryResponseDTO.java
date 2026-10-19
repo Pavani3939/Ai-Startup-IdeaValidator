@@ -16,4 +16,15 @@ public class HistoryResponseDTO {
     private String summary;
     private Integer successScore;
     private LocalDateTime createdAt;
+    private Integer readinessScore;
+
+    public HistoryResponseDTO(Long id, String title, String industry, String summary, Integer successScore, LocalDateTime createdAt) {
+        this.id = id;
+        this.title = title;
+        this.industry = industry;
+        this.summary = summary;
+        this.successScore = successScore;
+        this.createdAt = createdAt;
+        this.readinessScore = successScore != null ? (successScore <= 10 ? successScore * 10 : successScore) : null;
+    }
 }
