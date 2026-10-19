@@ -8,6 +8,7 @@ import com.startup.validator.entity.AnalysisReport;
 import com.startup.validator.entity.StartupIdea;
 import com.startup.validator.entity.User;
 import com.startup.validator.repository.AnalysisReportRepository;
+import com.startup.validator.repository.IdeaRepository;
 import com.startup.validator.repository.UserRepository;
 import com.startup.validator.service.IdeaService;
 import jakarta.validation.Valid;
@@ -28,13 +29,16 @@ public class IdeaController {
     private final IdeaService ideaService;
     private final AnalysisReportRepository reportRepository;
     private final UserRepository userRepository;
+    private final IdeaRepository ideaRepository;
 
     public IdeaController(IdeaService ideaService,
                           AnalysisReportRepository reportRepository,
-                          UserRepository userRepository) {
+                          UserRepository userRepository,
+                          IdeaRepository ideaRepository) {
         this.ideaService = ideaService;
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
+        this.ideaRepository = ideaRepository;
     }
 
     @PostMapping("/analyze")
@@ -44,10 +48,26 @@ public class IdeaController {
         if (description == null || description.length() < 20 || !description.contains(" ")) {
             return ResponseEntity.badRequest().body(Map.of("message", "Invalid input: Please provide a descriptive overview of your startup concept."));
         }
-
         String userEmail = userDetails != null ? userDetails.getUsername() : null;
         AnalysisResponseDTO response = ideaService.processIdea(request, userEmail);
         return ResponseEntity.ok(response);
+    }
+
+    // Helper to resolve authenticated user ID
+    private Long resolveUserId(UserDetails userDetails) {
+        if (userDetails != null) {
+            return userRepository.findByEmail(userDetails.getUsername())
+                    .map(User::getId)
+                    .orElse(null);
+        }
+        return null;
+    }
+
+    // Helper to verify ownership of a startup idea
+    private StartupIdea getIdeaIfOwned(Long ideaId, Long userId) {
+        return ideaRepository.findById(ideaId)
+                .filter(i -> userId != null && i.getUser() != null && userId.equals(i.getUser().getId()))
+                .orElseThrow(() -> new IllegalArgumentException("Idea not found or not owned by user"));
     }
 
     @GetMapping
@@ -58,13 +78,12 @@ public class IdeaController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         Long userId = resolveUserId(userDetails);
-        Page<AnalysisReport> reports;
-        if (userId != null) {
-            reports = reportRepository.findByUserId(userId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy)));
-        } else {
-            reports = reportRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy)));
+        if (userId == null) {
+            // Unauthenticated users receive no data
+            return ResponseEntity.ok(Page.empty());
         }
-
+        Page<AnalysisReport> reports = reportRepository.findByUserId(userId,
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy)));
         Page<HistoryResponseDTO> dtoPage = reports.map(r -> new HistoryResponseDTO(
                 r.getId(),
                 r.getStartupIdea() != null ? r.getStartupIdea().getTitle() : "Idea",
@@ -74,43 +93,37 @@ public class IdeaController {
                 r.getCreatedAt(),
                 r.getReadinessScore() != null ? r.getReadinessScore() : (r.getSuccessScore() != null ? r.getSuccessScore() * 10 : 70)
         ));
-
         return ResponseEntity.ok(dtoPage);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<IdeaDetailResponseDTO> getIdeaById(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<IdeaDetailResponseDTO> getIdeaById(@PathVariable Long id,
+                                                             @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = resolveUserId(userDetails);
+        // Ensure the authenticated user owns the idea (or allow demo fallback if unauthenticated)
+        if (userId != null) {
+            getIdeaIfOwned(id, userId);
+        }
         IdeaDetailResponseDTO detail = ideaService.getIdeaDetail(id, userId);
         return ResponseEntity.ok(detail);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteIdea(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> deleteIdea(@PathVariable Long id,
+                                        @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = resolveUserId(userDetails);
+        if (userId != null) {
+            getIdeaIfOwned(id, userId);
+        }
         ideaService.deleteIdea(id, userId);
         return ResponseEntity.ok(Map.of("message", "Idea deleted successfully"));
     }
 
     @GetMapping("/history")
-    public ResponseEntity<Page<HistoryResponseDTO>> getHistory(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Page<HistoryResponseDTO>> getHistory(@RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "10") int size,
+                                                                @RequestParam(defaultValue = "createdAt") String sortBy,
+                                                                @AuthenticationPrincipal UserDetails userDetails) {
         return getUserIdeas(page, size, sortBy, userDetails);
-    }
-
-    private Long resolveUserId(UserDetails userDetails) {
-        if (userDetails != null) {
-            return userRepository.findByEmail(userDetails.getUsername())
-                    .map(User::getId)
-                    .orElse(null);
-        }
-        return null;
     }
 }

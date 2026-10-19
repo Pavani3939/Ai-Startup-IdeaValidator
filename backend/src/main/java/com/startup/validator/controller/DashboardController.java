@@ -23,22 +23,28 @@ public class DashboardController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping
-    public ResponseEntity<DashboardDTO> getDashboard(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = null;
+    private Long resolveUserId(UserDetails userDetails) {
         if (userDetails != null) {
-            userId = userRepository.findByEmail(userDetails.getUsername())
+            return userRepository.findByEmail(userDetails.getUsername())
                     .map(User::getId)
                     .orElse(null);
         }
+        return null;
+    }
 
+    @GetMapping
+    public ResponseEntity<DashboardDTO> getDashboard(@AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = resolveUserId(userDetails);
         if (userId == null) {
-            // Default demo metrics fallback
-            userId = userRepository.findByEmail("demo@startupvalidator.com")
-                    .map(User::getId)
-                    .orElse(1L);
+            // Return empty metrics for unauthenticated users
+            DashboardDTO empty = DashboardDTO.builder()
+                    .totalIdeas(0L)
+                    .avgReadinessScore(0.0)
+                    .highRiskCount(0L)
+                    .reportsGenerated(0L)
+                    .build();
+            return ResponseEntity.ok(empty);
         }
-
         DashboardDTO metrics = ideaService.getDashboardMetrics(userId);
         return ResponseEntity.ok(metrics);
     }
