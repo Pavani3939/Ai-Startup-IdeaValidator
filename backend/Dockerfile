@@ -1,23 +1,13 @@
-FROM eclipse-temurin:21-jdk-alpine AS build
-LABEL maintainer="Yellaturu Pavani <yellaturu.pavani@example.com>"
+FROM maven:3-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-# Copy Maven wrapper and pom.xml
-COPY mvnw .
-COPY .mvn .mvn
 COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
-# Resolve dependencies (cached layer)
-RUN ./mvnw dependency:go-offline -B
-
-# Copy source code
 COPY src src
+RUN mvn -B clean package -DskipTests
 
-# Package the application
-RUN ./mvnw clean package -DskipTests
-
-# Runtime image
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar

@@ -1,4 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+// Vercel builds must provide the public Spring API URL. Falling back to
+// localhost in production sends requests to each visitor's own computer.
+const API_BASE_URL = import.meta.env.VITE_API_URL?.trim() ||
+  (import.meta.env.DEV ? 'http://localhost:8080/api' : '');
 
 // Helper for local mock persistence when backend is offline/unreachable on cloud demo
 function getLocalIdeas() {
@@ -390,6 +393,9 @@ function handleClientSideFallback(path, method, body) {
 }
 
 async function request(path, options = {}) {
+  if (!API_BASE_URL) {
+    throw new Error('Account service is not configured. Set VITE_API_URL to your deployed backend API URL in Vercel, then redeploy.');
+  }
   const token = localStorage.getItem('token');
   const headers = {
     'Content-Type': 'application/json',

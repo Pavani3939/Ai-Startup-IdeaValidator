@@ -16,11 +16,11 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: maven
 
       - name: Build backend JAR
         working-directory: backend
-        run: |
-          ./mvnw -B package -DskipTests
+        run: mvn -B package -DskipTests
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -34,27 +34,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: Dockerfile
+          context: ./backend
+          file: ./backend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/validator-backend:latest
-
-      - name: Deploy to Render (via API)
-        env:
-          RENDER_TOKEN: ${{ secrets.RENDER_API_TOKEN }}
-        run: |
-          curl -X POST https://api.render.com/v1/services \
-            -H "Authorization: Bearer $RENDER_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{
-                "service": {
-                  "name": "validator-backend",
-                  "type": "web_service",
-                  "env": "docker",
-                  "docker": {
-                    "image": "${{ secrets.DOCKER_HUB_USERNAME }}/validator-backend:latest"
-                  },
-                  "plan": "free",
-                  "region": "oregon"
-                }
-              }'
