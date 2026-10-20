@@ -433,6 +433,8 @@ async function request(path, options = {}) {
     }
     return response;
   } catch (err) {
+    // Backend connectivity issues should surface to the UI; no client-side fallback.
+    throw err;
     // If backend is unreachable or fails to fetch (e.g. cloud deployment without backend host),
     // gracefully switch to intelligent client-side fallback engine so live demo works 100%!
     if (err.name === 'TypeError' || err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('Load failed')) {

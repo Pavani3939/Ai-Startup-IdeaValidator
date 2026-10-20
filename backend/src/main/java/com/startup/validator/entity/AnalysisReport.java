@@ -25,7 +25,7 @@ public class AnalysisReport {
     private String summary;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "json")
+    @Column(columnDefinition = "TEXT")
     private List<String> advantages;
 
     @Type(JsonType.class)
