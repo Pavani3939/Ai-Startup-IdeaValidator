@@ -1,0 +1,60 @@
+name: Build & Push Docker Image
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build backend JAR
+        working-directory: backend
+        run: |
+          ./mvnw -B package -DskipTests
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: "229x1a04e9"
+          password: "dckr_pat_VSpZP8-7ONlvKJXMUsKAUfuHq30"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/validator-backend:latest
+
+      - name: Deploy to Render (via API)
+        env:
+          RENDER_TOKEN: ${{ secrets.RENDER_API_TOKEN }}
+        run: |
+          curl -X POST https://api.render.com/v1/services \
+            -H "Authorization: Bearer $RENDER_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+                "service": {
+                  "name": "validator-backend",
+                  "type": "web_service",
+                  "env": "docker",
+                  "docker": {
+                    "image": "${{ secrets.DOCKER_HUB_USERNAME }}/validator-backend:latest"
+                  },
+                  "plan": "free",
+                  "region": "oregon"
+                }
+              }'
