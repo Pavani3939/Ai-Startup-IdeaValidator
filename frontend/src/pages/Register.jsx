@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import './Register.css/Register.css';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -40,42 +41,24 @@ export default function Register() {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'var(--color-bg-main)',
-      padding: '24px'
-    }}>
-      <div className="card" style={{ maxWidth: '460px', width: '100%', padding: '36px 32px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '20px', color: 'var(--color-primary)', marginBottom: '12px' }}>
+    <main className="register-page">
+      <section className="card register-card">
+        <div className="register-header">
+          <Link to="/" className="register-brand">
             <Sparkles size={24} />
-            <span style={{ color: 'var(--color-text-primary)' }}>StartupValidator<span style={{ color: 'var(--color-primary)' }}>.ai</span></span>
+            <span className="register-brand-name">StartupValidator<span>.ai</span></span>
           </Link>
-          <h2 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
+          <h2 className="register-title">
             Create Founder Account
           </h2>
-          <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+          <p className="register-description">
             Start validating ideas with real-time AI and structured modeling.
           </p>
         </div>
 
         {error && (
-          <div style={{
-            background: '#FEF2F2',
-            border: '1px solid #FECACA',
-            color: 'var(--color-error)',
-            borderRadius: 'var(--radius-input)',
-            padding: '10px 14px',
-            fontSize: '13px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginBottom: '20px'
-          }}>
-            <AlertCircle size={16} />
+          <div className="register-error" role="alert">
+            <AlertCircle size={16} aria-hidden="true" />
             <span>{error}</span>
           </div>
         )}
@@ -143,21 +126,20 @@ export default function Register() {
 
           <button
             type="submit"
-            className="btn btn-primary"
-            style={{ width: '100%', marginTop: '8px' }}
+            className="btn btn-primary register-submit"
             disabled={loading}
           >
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+        <div className="register-signin">
           Already have an account?{' '}
-          <Link to="/login" style={{ fontWeight: 600 }}>
+          <Link to="/login">
             Sign in
           </Link>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
