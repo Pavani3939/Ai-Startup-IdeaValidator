@@ -1,0 +1,112 @@
+.register-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  justify-content: center;
+  padding: clamp(12px, 4vw, 32px);
+  background: var(--color-bg-main);
+}
+
+.register-card {
+  width: min(100%, 460px);
+  margin-block: auto;
+  padding: clamp(22px, 4vw, 36px) clamp(18px, 5vw, 32px);
+}
+
+.register-header {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.register-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
+  margin-bottom: 12px;
+  color: var(--color-primary);
+  font-size: clamp(17px, 5vw, 20px);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.register-brand svg {
+  flex: 0 0 auto;
+}
+
+.register-brand-name {
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.register-brand-name span {
+  color: var(--color-primary);
+}
+
+.register-title {
+  margin-bottom: 6px;
+  color: var(--color-text-primary);
+  font-size: clamp(20px, 5.5vw, 22px);
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.register-description {
+  max-width: 340px;
+  margin-inline: auto;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.register-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-input);
+  background: #FEF2F2;
+  color: var(--color-error);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.register-error svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.register-submit {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.register-signin {
+  margin-top: 24px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.register-signin a {
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .register-header {
+    margin-bottom: 24px;
+  }
+
+  .register-card .form-group {
+    margin-bottom: 18px;
+  }
+
+  .register-error {
+    padding-inline: 12px;
+  }
+}
