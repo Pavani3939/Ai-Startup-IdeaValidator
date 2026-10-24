@@ -460,3 +460,104 @@ a:hover {
     z-index: 25;
   }
 }
+/* Responsive refinements */
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-header {
+    padding-inline: 24px;
+  }
+
+  .page-container {
+    padding: 24px;
+  }
+
+  .card,
+  .kpi-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    min-height: 60px;
+    height: auto;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .page-container {
+    padding: 20px 16px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .kpi-grid {
+    gap: 14px;
+  }
+
+  .data-table {
+    min-width: 640px;
+  }
+
+  .score-big {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header {
+    flex-wrap: wrap;
+  }
+
+  .dashboard-header .btn {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .page-container {
+    padding: 16px 12px;
+  }
+
+  .card,
+  .kpi-card {
+    padding: 16px;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-value {
+    font-size: 26px;
+  }
+
+  .btn {
+    max-width: 100%;
+    padding-inline: 16px;
+  }
+
+  .table-responsive {
+    margin-inline: -4px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 12px;
+  }
+}
+
+/* Prevent horizontal page overflow */
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
